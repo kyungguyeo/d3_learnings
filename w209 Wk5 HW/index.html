@@ -1,0 +1,158 @@
+<html>
+<head>
+	<title>Static Viz in D3</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
+</head>
+<body>
+	<div class="jumbotron">
+		<h3>My Daily Coffee Intake</h3>
+	</div>
+	<div class="container">
+		<p>The Data</p>
+		<table class="table">
+			<thead></thead>
+			<tbody></tbody>
+		</table>
+		<p>Number of Cups Drunk</p>
+	</div>
+	<style type="text/css">
+		.jumbotron {
+			text-align: center;
+		}
+		.container {
+			text-align: center;
+		}
+		.axis path,
+		.axis line {
+		    fill: none;
+		    stroke: black;
+		    shape-rendering: crispEdges;
+		}
+
+		.axis text {
+		    font-family: sans-serif;
+		    font-size: 14px;
+		}
+		svg {
+			display: block;
+			margin: auto;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.15/d3.js"></script>
+	<script type="text/javascript">
+		d3.csv("Coffee_Data.csv", function(datas) {
+  			var data = {};
+  			data.name = [];
+  			data.date = [];
+  			data.quantity = [];
+  			data.time_of_day = [];
+  			for (i=0; i<datas.length; i++) {
+  				data.name.push(datas[i]['Coffee Name']);
+  				data.date.push(datas[i]['Date']);
+  				data.quantity.push(datas[i]['Quantity (cups)']);
+  				data.time_of_day.push(datas[i]['Time']);
+  			}
+  			var w = 600;
+  			var h = 300;
+  			var svg = d3.select(".container")
+  							.append("svg")
+  							.attr("width",w)
+  							.attr("height",h);
+			dataset = data.quantity;
+			daydata = data.date;
+			timedata = data.time_of_day;
+			var padding = 20;
+			ypadding = padding + 10;
+			// var xAxisScale = d3.scale.ordinal()
+   //  					.domain([daydata])
+   //  					.rangeRoundBands([0, w], .1);
+			var xScale = d3.scale.linear()
+							.domain([0, d3.max(dataset, function(d) { return i+2; })])
+							.range([ypadding, w-ypadding*2]);
+			var yScale = d3.scale.linear()
+							.domain([0, d3.max(dataset, function(d) { return d; })])
+							.range([h-padding, padding]);
+			var xAxis = d3.svg.axis()
+							.scale(xScale);
+			var yAxis = d3.svg.axis()
+							.orient("left")
+			                .scale(yScale)
+			                .ticks(4);
+  			svg.selectAll("rect")
+				   .data(dataset)
+				   .enter()
+				   .append("rect")
+				   .attr("x", function(d,i) {
+				        return xScale(i+1);
+				   })
+				   .attr("y", function(d) {
+				   		return yScale(d);
+				   })
+				   .attr("width", 20)
+				   .attr("height", function(d) {
+				        return h-yScale(d)-padding;
+				   })
+				   .attr("fill","teal");
+			svg.selectAll("text")
+			   .data(dataset)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return d;
+			   })
+			   .attr("text-anchor", "middle")
+			   .attr("x", function(d, i) {
+			   		return xScale(i+1) + 10;
+			   })
+			   .attr("y", function(d) {
+			   		return yScale(d) + 10;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "white");
+			svg.append('g')
+					.attr('class','axis')
+					.attr("transform", "translate(0," + (h-padding) + ")")
+					.call(xAxis);
+			svg.append("g")
+				    .attr("class", "axis")
+				    .attr("transform", "translate(" + ypadding + ",0)")
+				    .call(yAxis);
+		});
+	</script>
+	<script type="text/javascript">
+		d3.csv("Coffee_Data.csv", function(datas) {
+			var data = {};
+  			data.name = [];
+  			data.date = [];
+  			data.quantity = [];
+  			data.time_of_day = [];
+  			for (i=0; i<datas.length; i++) {
+  				data.name.push(datas[i]['Coffee Name']);
+  				data.date.push(datas[i]['Date']);
+  				data.quantity.push(datas[i]['Quantity (cups)']);
+  				data.time_of_day.push(datas[i]['Time']);
+  			}
+  			console.log(data.name.length);
+  			$('.table').find('thead')
+  				.append($('<tr>')
+  					.append($('<th>').text('Type of Coffee'))
+  					.append($('<th>').text('Date'))
+  					.append($('<th>').text('Quantity (cups)'))
+  					.append($('<th>').text('Time'))
+  					);
+  			for (i=0; i<data.name.length; i++) {
+				$(".table").find('tbody')
+				    .append($('<tr>')
+				        .append($('<td>').text(data.name[i]))
+				        .append($('<td>').text(data.date[i]))
+				        .append($('<td>').text(data.quantity[i]))
+				        .append($('<td>').text(data.time_of_day[i]))
+				    );
+  			};
+		});
+	</script>
+</body>
+</html>
